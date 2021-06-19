@@ -8,9 +8,11 @@ const { v4: uuidv4 } = require("uuid");
 require("dotenv").config();
 
 let PORT = process.env.PORT_API;
+let CLIENT_URL = process.env.URL_APP;
 
 if (process.env.NODE_ENV === "production") {
   PORT = process.env.PORT || 5000;
+  CLIENT_URL = process.env.URL_APP_PROD;
 }
 
 var mockSessions = [
@@ -21,7 +23,7 @@ var mockSessions = [
 ];
 
 const server = express();
-server.use(cors({ origin: process.env.URL_APP }));
+server.use(cors({ origin: CLIENT_URL }));
 server.use(express.json());
 
 server.get("/get-sessions", (_, res) => {
@@ -68,7 +70,7 @@ server.get("/clear-sessions", (_, res) => {
 const httpServer = http.createServer(server);
 io = socketio(httpServer, {
   cors: {
-    origin: process.env.URL_APP,
+    origin: CLIENT_URL,
   },
 });
 
