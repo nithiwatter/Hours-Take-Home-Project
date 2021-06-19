@@ -1,11 +1,16 @@
 import React from "react";
 import {
+  Avatar,
   Box,
+  Button,
   CircularProgress,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
   Typography,
   makeStyles,
 } from "@material-ui/core";
-import Link from "next/link";
 import { useRouter } from "next/router";
 import io from "socket.io-client";
 
@@ -42,7 +47,7 @@ export default function Sessions() {
       // if no session belongs to this id
       if (res.status === "failure") {
         // alert the user
-        router.push(`/`);
+        handleBack();
       } else {
         setSession(res.data.session);
         setLoading(false);
@@ -53,6 +58,10 @@ export default function Sessions() {
       socket.disconnect();
     };
   }, [router.isReady]);
+
+  const handleBack = () => {
+    router.push("/");
+  };
 
   if (loading) {
     return (
@@ -65,9 +74,19 @@ export default function Sessions() {
   return (
     <div className={classes.container}>
       <Typography variant="h3">{`Session: ${session.sessionId}`}</Typography>
-      <Link href="/">
-        <a>Home</a>
-      </Link>
+      <List>
+        {session.participants.map((participant) => (
+          <ListItem key={participant}>
+            <ListItemAvatar>
+              <Avatar>{participant === "" ? "Unknown" : participant[0]}</Avatar>
+            </ListItemAvatar>
+            <ListItemText>{participant}</ListItemText>
+          </ListItem>
+        ))}
+      </List>
+      <Button onClick={handleBack} variant="contained" color="primary">
+        Back to Home
+      </Button>
     </div>
   );
 }
