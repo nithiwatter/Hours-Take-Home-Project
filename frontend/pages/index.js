@@ -29,7 +29,22 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Home() {
   const [open, setOpen] = React.useState(false);
+  const [sessionIds, setSessionIds] = React.useState([]);
   const classes = useStyles();
+
+  const join = async () => {
+    await getSessions();
+    setOpen(true);
+  };
+
+  const getSessions = async () => {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_URL_API}/get-sessions`
+    );
+    const sessionIds = data.data.sessionIds;
+
+    setSessionIds(sessionIds);
+  };
 
   return (
     <>
@@ -42,17 +57,17 @@ export default function Home() {
             To get started, click join
           </Typography>
           <Box display="flex" justifyContent="center" m={1}>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={() => setOpen(true)}
-            >
+            <Button variant="contained" color="primary" onClick={join}>
               Join
             </Button>
           </Box>
         </div>
       </div>
-      <SimpleDialog open={open} onClose={() => setOpen(false)} />
+      <SimpleDialog
+        open={open}
+        onClose={() => setOpen(false)}
+        sessionIds={sessionIds}
+      />
     </>
   );
 }
@@ -60,9 +75,8 @@ export default function Home() {
 const SimpleDialog = (props) => {
   const router = useRouter();
   const [name, setName] = React.useState("");
-  const [sessionIds, setSessionIds] = React.useState([]);
   const [selected, setSelected] = React.useState(-1);
-  const { onClose, open } = props;
+  const { sessionIds, onClose, open } = props;
 
   React.useEffect(() => {
     var initialName = localStorage.getItem("name");
@@ -71,25 +85,15 @@ const SimpleDialog = (props) => {
     setName(initialName);
   }, []);
 
-  React.useEffect(async () => {
-    const { data } = await axios.get(
-      `${process.env.NEXT_PUBLIC_URL_API}/get-sessions`
-    );
-    const sessionIds = data.data.sessionIds;
-
-    setSessionIds(sessionIds);
-  }, []);
-
   const handleChange = (event) => {
     setName(event.target.value);
   };
 
-  const handleClose = async (saveName) => {
+  const handleClose = async () => {
     if (selected === -1) {
       localStorage.setItem("name", name);
       await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/create-session`);
     }
-
     onClose();
     router.push("/sessions");
   };
