@@ -14,6 +14,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -56,24 +57,35 @@ export default function Home() {
 }
 
 const SimpleDialog = (props) => {
-  const sessionIds = ["abc", "def", "ghi"];
   const [name, setName] = React.useState("");
+  const [sessionIds, setSessionIds] = React.useState([]);
   const [selected, setSelected] = React.useState(-1);
   const { onClose, open } = props;
 
   React.useEffect(() => {
     var initialName = localStorage.getItem("name");
     initialName = initialName !== null ? initialName : "";
+
     setName(initialName);
+  }, []);
+
+  React.useEffect(async () => {
+    const { data } = await axios.get(
+      `${process.env.NEXT_PUBLIC_URL_API}/get-sessions`
+    );
+    const sessionIds = data.data.sessionIds;
+
+    setSessionIds(sessionIds);
   }, []);
 
   const handleChange = (event) => {
     setName(event.target.value);
   };
 
-  const handleClose = (saveName) => {
-    if (saveName) {
+  const handleClose = async (saveName) => {
+    if (selected === -1) {
       localStorage.setItem("name", name);
+      await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/create-session`);
     }
     onClose();
   };
@@ -112,10 +124,10 @@ const SimpleDialog = (props) => {
         </List>
       </DialogContent>
       <DialogActions>
-        <Button onClick={() => handleClose(false)} color="primary">
+        <Button onClick={onClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={() => handleClose(true)} color="primary">
+        <Button onClick={handleClose} color="primary">
           Create/Join
         </Button>
       </DialogActions>
