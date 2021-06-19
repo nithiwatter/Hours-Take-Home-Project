@@ -42,7 +42,6 @@ export default function Home() {
       `${process.env.NEXT_PUBLIC_URL_API}/get-sessions`
     );
     const sessionIds = data.data.sessionIds;
-
     setSessionIds(sessionIds);
   };
 
@@ -89,7 +88,7 @@ const SimpleDialog = (props) => {
     setName(event.target.value);
   };
 
-  const handleClose = async () => {
+  const handleJoin = async () => {
     if (selected === -1) {
       localStorage.setItem("name", name);
       await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/create-session`);
@@ -98,52 +97,68 @@ const SimpleDialog = (props) => {
     router.push("/sessions");
   };
 
+  const handleClose = () => {
+    setSelected(-1);
+    onClose();
+  };
+
   const handleClear = async () => {
     await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/clear-sessions`);
+    setSelected(-1);
     onClose();
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Join your session</DialogTitle>
+
       <DialogContent>
-        <DialogContentText>
-          You can either create a new session or join existing one
-        </DialogContentText>
-        <TextField
-          fullWidth
-          label="Name"
-          value={name}
-          onChange={handleChange}
-        />
-        <List>
-          <ListItem
-            button
-            onClick={() => setSelected(-1)}
-            selected={selected === -1}
-          >
-            <ListItemText>Create a session</ListItemText>
-          </ListItem>
-          {sessionIds.map((sessionId, idx) => (
-            <ListItem
-              button
-              onClick={() => setSelected(idx)}
-              selected={selected === idx}
-              key={sessionId}
-            >
-              <ListItemText>{sessionId}</ListItemText>
-            </ListItem>
-          ))}
-        </List>
+        <Box display="flex">
+          <Box>
+            <DialogContentText>
+              You can either create a new session or join existing one
+            </DialogContentText>
+            <TextField
+              fullWidth
+              label="Name"
+              value={name}
+              onChange={handleChange}
+            />
+            <List>
+              <ListItem
+                button
+                onClick={() => setSelected(-1)}
+                selected={selected === -1}
+              >
+                <ListItemText>Create a session</ListItemText>
+              </ListItem>
+              {sessionIds.map((sessionId, idx) => (
+                <ListItem
+                  button
+                  onClick={() => setSelected(idx)}
+                  selected={selected === idx}
+                  key={sessionId}
+                >
+                  <ListItemText>{sessionId}</ListItemText>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
+          {selected !== -1 && (
+            <Box ml={4}>
+              <DialogContentText>Participants</DialogContentText>
+            </Box>
+          )}
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClear} color="primary">
           Clear all sessions
         </Button>
-        <Button onClick={onClose} color="primary">
+        <Button onClick={handleClose} color="primary">
           Cancel
         </Button>
-        <Button onClick={handleClose} color="primary">
+        <Button onClick={handleJoin} color="primary">
           Create/Join
         </Button>
       </DialogActions>
