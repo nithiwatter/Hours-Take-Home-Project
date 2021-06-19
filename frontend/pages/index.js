@@ -17,7 +17,7 @@ import {
 import { useRouter } from "next/router";
 import axios from "axios";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles((_) => ({
   container: {
     minHeight: "100vh",
     display: "flex",
@@ -90,9 +90,10 @@ const SimpleDialog = (props) => {
   };
 
   const handleJoin = async () => {
+    localStorage.setItem("name", name);
+
     if (selected === -1) {
       // create a new session
-      localStorage.setItem("name", name);
       const { data } = await axios.get(
         `${process.env.NEXT_PUBLIC_URL_API}/create-session`
       );

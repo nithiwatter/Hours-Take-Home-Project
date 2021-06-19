@@ -25,6 +25,23 @@ server.get("/get-sessions", (_, res) => {
   });
 });
 
+server.get("/get-session/:id", (_, res) => {
+  const session = mockSessions.find((session) => session.sessionId === id);
+
+  if (session) {
+    res.send({
+      status: "success",
+      data: {
+        session,
+      },
+    });
+  } else {
+    res.send({
+      status: "failure",
+    });
+  }
+});
+
 server.get("/create-session", (_, res) => {
   const newSessionId = uuidv4();
   mockSessions.push({ sessionId: newSessionId, participants: [] });
@@ -65,9 +82,13 @@ io.on("connect", (socket) => {
         console.log(`${name} joining session ${id}`);
       }
 
+      // pass back the requested session to be displayed on client
       callback({
         status: "success",
         description: `Successfully joining session ${id}`,
+        data: {
+          session,
+        },
       });
     } else {
       // notify error to client by calling callback
