@@ -111,7 +111,10 @@ io.on("connect", (socket) => {
     socket.session.participants = socket.session.participants.filter(
       (name) => name != socket.name
     );
-    io.to(socket.session.sessionId).emit("left", { name: socket.name });
+    io.to(socket.session.sessionId).emit("left", {
+      session: socket.session,
+      name: socket.name,
+    });
     console.log(`Disconnected socket:  ${socket.id}, User: ${socket.name}`);
   });
 });

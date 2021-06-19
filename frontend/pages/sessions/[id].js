@@ -45,12 +45,11 @@ export default function Sessions() {
     socket = io(process.env.NEXT_PUBLIC_URL_API);
 
     socket.on("joined", ({ session, name }) => {
-      console.log(session);
-      console.log(name);
+      setSession(session);
     });
 
-    socket.on("left", ({ name }) => {
-      console.log(name);
+    socket.on("left", ({ session, name }) => {
+      setSession(session);
     });
 
     socket.emit("join", { id, name }, (res) => {
