@@ -52,11 +52,11 @@ io = socketio(httpServer, {
 io.on("connect", (socket) => {
   console.log(`Connected socket:  ${socket.id}`);
 
-  socket.on("join", ({ id, name }) => {
+  socket.on("join", ({ id, name }, callback) => {
     const session = mockSessions.find((session) => session.sessionId === id);
 
-    // if the session exists
     if (session) {
+      // if the session exists
       const participants = session.participants;
 
       // if the user with this name is not in the participants' list
@@ -64,6 +64,17 @@ io.on("connect", (socket) => {
         session.participants.push(name);
         console.log(`${name} joining session ${id}`);
       }
+
+      callback({
+        status: "success",
+        description: `Successfully joining session ${id}`,
+      });
+    } else {
+      // notify error to client by calling callback
+      callback({
+        status: "failure",
+        description: "No session belongs to this session id...",
+      });
     }
   });
 

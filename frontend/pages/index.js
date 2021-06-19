@@ -156,6 +156,13 @@ const SimpleDialog = (props) => {
           {selected !== -1 && (
             <Box ml={4}>
               <DialogContentText>Participants</DialogContentText>
+              <List>
+                {sessions[selected].participants.map((participant) => (
+                  <ListItem key={participant}>
+                    <ListItemText>{participant}</ListItemText>
+                  </ListItem>
+                ))}
+              </List>
             </Box>
           )}
         </Box>
