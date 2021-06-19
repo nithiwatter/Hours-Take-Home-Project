@@ -67,18 +67,26 @@ io = socketio(httpServer, {
 });
 
 io.on("connect", (socket) => {
-  console.log(`Connected socket:  ${socket.id}`);
+  console.log(`Connected socket: ${socket.id}`);
+  socket.name = "";
+  socket.session = { sessionId: "", participants: [] };
 
   socket.on("join", ({ id, name }, callback) => {
     const session = mockSessions.find((session) => session.sessionId === id);
 
     if (session) {
       // if the session exists
+      // associate the name and session with this socket for easy disconnect notification
+      socket.name = name;
+      socket.session = session;
       const participants = session.participants;
 
       // if the user with this name is not in the participants' list
       if (!participants.includes(name)) {
         session.participants.push(name);
+        socket.join(id);
+        // emit to client the recently-joined socket and the updated session object
+        socket.to(id).emit("joined", { session, name });
         console.log(`${name} joining session ${id}`);
       }
 
@@ -100,7 +108,10 @@ io.on("connect", (socket) => {
   });
 
   socket.on("disconnect", () => {
-    console.log(`Disconnected socket:  ${socket.id}`);
+    socket.session.participants = socket.session.participants.filter(
+      (name) => name != socket.name
+    );
+    console.log(`Disconnected socket:  ${socket.id}, User: ${socket.name}`);
   });
 });
 

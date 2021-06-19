@@ -43,6 +43,12 @@ export default function Sessions() {
 
     const name = localStorage.getItem("name");
     socket = io(process.env.NEXT_PUBLIC_URL_API);
+
+    socket.on("joined", ({ session, name }) => {
+      console.log(session);
+      console.log(name);
+    });
+
     socket.emit("join", { id, name }, (res) => {
       // if no session belongs to this id
       if (res.status === "failure") {
@@ -73,7 +79,10 @@ export default function Sessions() {
 
   return (
     <div className={classes.container}>
-      <Typography variant="h3">{`Session: ${session.sessionId}`}</Typography>
+      <Typography
+        variant="h3"
+        align="center"
+      >{`Session: ${session.sessionId}`}</Typography>
       <List>
         {session.participants.map((participant) => (
           <ListItem key={participant}>
