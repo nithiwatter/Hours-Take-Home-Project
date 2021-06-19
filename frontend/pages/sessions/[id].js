@@ -46,6 +46,7 @@ export default function Sessions() {
     const name = localStorage.getItem("name");
     // redirected if name not in local storage
     if (!name) return handleBack();
+
     socket = io(process.env.NEXT_PUBLIC_URL_API);
 
     socket.on("joined", ({ session, name }) => {
