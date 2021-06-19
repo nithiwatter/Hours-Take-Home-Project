@@ -29,7 +29,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function Home() {
   const [open, setOpen] = React.useState(false);
-  const [sessionIds, setSessionIds] = React.useState([]);
+  const [sessions, setSessions] = React.useState([]);
   const classes = useStyles();
 
   const join = async () => {
@@ -38,11 +38,12 @@ export default function Home() {
   };
 
   const getSessions = async () => {
+    // session: { sessionId: String, participants: [] }
     const { data } = await axios.get(
       `${process.env.NEXT_PUBLIC_URL_API}/get-sessions`
     );
-    const sessionIds = data.data.sessionIds;
-    setSessionIds(sessionIds);
+    const sessions = data.data.sessions;
+    setSessions(sessions);
   };
 
   return (
@@ -65,7 +66,7 @@ export default function Home() {
       <SimpleDialog
         open={open}
         onClose={() => setOpen(false)}
-        sessionIds={sessionIds}
+        sessions={sessions}
       />
     </>
   );
@@ -75,7 +76,7 @@ const SimpleDialog = (props) => {
   const router = useRouter();
   const [name, setName] = React.useState("");
   const [selected, setSelected] = React.useState(-1);
-  const { sessionIds, onClose, open } = props;
+  const { sessions, onClose, open } = props;
 
   React.useEffect(() => {
     let initialName = localStorage.getItem("name");
@@ -90,11 +91,19 @@ const SimpleDialog = (props) => {
 
   const handleJoin = async () => {
     if (selected === -1) {
+      // create a new session
       localStorage.setItem("name", name);
-      await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/create-session`);
+      const { data } = await axios.get(
+        `${process.env.NEXT_PUBLIC_URL_API}/create-session`
+      );
+      const sessionId = data.data.sessionId;
+      onClose();
+      router.push(`/sessions/${sessionId}`);
+    } else {
+      // join an existing session
+      onClose();
+      router.push(`/sessions/${sessions[selected].sessionId}`);
     }
-    onClose();
-    router.push(`/sessions/${sessionIds[selected]}`);
   };
 
   const handleClose = () => {
@@ -132,14 +141,14 @@ const SimpleDialog = (props) => {
               >
                 <ListItemText>Create a session</ListItemText>
               </ListItem>
-              {sessionIds.map((sessionId, idx) => (
+              {sessions.map((session, idx) => (
                 <ListItem
                   button
                   onClick={() => setSelected(idx)}
                   selected={selected === idx}
-                  key={sessionId}
+                  key={session.sessionId}
                 >
-                  <ListItemText>{sessionId}</ListItemText>
+                  <ListItemText>{session.sessionId}</ListItemText>
                 </ListItem>
               ))}
             </List>

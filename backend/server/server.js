@@ -4,7 +4,12 @@ const socketio = require("socket.io");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 
-var mockSessionIds = ["abc", "def", "ghi", "jkl"];
+var mockSessions = [
+  { sessionId: "abc", participants: [] },
+  { sessionId: "def", participants: [] },
+  { sessionId: "ghi", participants: [] },
+  { sessionId: "jkl", participants: [] },
+];
 
 // load env variables
 require("dotenv").config();
@@ -16,17 +21,24 @@ server.use(express.json());
 server.get("/get-sessions", (_, res) => {
   res.send({
     status: "success",
-    data: { sessionIds: mockSessionIds },
+    data: { sessions: mockSessions },
   });
 });
 
 server.get("/create-session", (_, res) => {
-  mockSessionIds.push(uuidv4());
-  res.send({ status: "success" });
+  const newSessionId = uuidv4();
+  mockSessions.push({ sessionId: newSessionId, participants: [] });
+
+  res.send({
+    status: "success",
+    data: {
+      sessionId: newSessionId,
+    },
+  });
 });
 
 server.get("/clear-sessions", (_, res) => {
-  mockSessionIds = [];
+  mockSessions = [];
   res.send({ status: "success" });
 });
 
@@ -39,6 +51,21 @@ io = socketio(httpServer, {
 
 io.on("connect", (socket) => {
   console.log(`Connected socket:  ${socket.id}`);
+
+  socket.on("join", ({ id, name }) => {
+    const session = mockSessions.find((session) => session.sessionId === id);
+
+    // if the session exists
+    if (session) {
+      const participants = session.participants;
+
+      // if the user with this name is not in the participants' list
+      if (!participants.includes(name)) {
+        session.participants.push(name);
+        console.log(`${name} joining session ${id}`);
+      }
+    }
+  });
 
   socket.on("disconnect", () => {
     console.log(`Disconnected socket:  ${socket.id}`);
