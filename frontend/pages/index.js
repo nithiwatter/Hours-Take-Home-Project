@@ -78,7 +78,7 @@ const SimpleDialog = (props) => {
   const { sessionIds, onClose, open } = props;
 
   React.useEffect(() => {
-    var initialName = localStorage.getItem("name");
+    let initialName = localStorage.getItem("name");
     initialName = initialName !== null ? initialName : "";
 
     setName(initialName);
@@ -94,7 +94,7 @@ const SimpleDialog = (props) => {
       await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/create-session`);
     }
     onClose();
-    router.push("/sessions");
+    router.push(`/sessions/${sessionIds[selected]}`);
   };
 
   const handleClose = () => {

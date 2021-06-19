@@ -1,5 +1,6 @@
 const express = require("express");
 const http = require("http");
+const socketio = require("socket.io");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 
@@ -30,6 +31,19 @@ server.get("/clear-sessions", (_, res) => {
 });
 
 const httpServer = http.createServer(server);
+io = socketio(httpServer, {
+  cors: {
+    origin: process.env.URL_APP,
+  },
+});
+
+io.on("connect", (socket) => {
+  console.log(`Connected socket:  ${socket.id}`);
+
+  socket.on("disconnect", () => {
+    console.log(`Disconnected socket:  ${socket.id}`);
+  });
+});
 
 httpServer.listen(process.env.PORT_API, () => {
   console.log(`> Ready on ${process.env.PORT_API}`);
