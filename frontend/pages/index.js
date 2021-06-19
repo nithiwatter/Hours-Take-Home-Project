@@ -14,6 +14,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import axios from "axios";
 
@@ -76,6 +77,7 @@ const SimpleDialog = (props) => {
   const router = useRouter();
   const [name, setName] = React.useState("");
   const [selected, setSelected] = React.useState(-1);
+  const { enqueueSnackbar } = useSnackbar();
   const { sessions, onClose, open } = props;
 
   React.useEffect(() => {
@@ -90,6 +92,8 @@ const SimpleDialog = (props) => {
   };
 
   const handleJoin = async () => {
+    if (name === "")
+      return enqueueSnackbar("Your name is empty", { variant: "warning" });
     localStorage.setItem("name", name);
 
     if (selected === -1) {
