@@ -11,6 +11,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import io from "socket.io-client";
 
@@ -33,6 +34,7 @@ export default function Sessions() {
     participants: [],
   });
   const classes = useStyles();
+  const { enqueueSnackbar } = useSnackbar();
   const router = useRouter();
   const { id } = router.query;
 
@@ -46,10 +48,12 @@ export default function Sessions() {
 
     socket.on("joined", ({ session, name }) => {
       setSession(session);
+      enqueueSnackbar(`${name} joined the session!`, { variant: "success" });
     });
 
     socket.on("left", ({ session, name }) => {
       setSession(session);
+      enqueueSnackbar(`${name} left the session!`, { variant: "warning" });
     });
 
     socket.emit("join", { id, name }, (res) => {

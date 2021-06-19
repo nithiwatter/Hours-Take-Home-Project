@@ -1,5 +1,7 @@
 import React from "react";
-import { CssBaseline } from "@material-ui/core";
+import { CssBaseline, IconButton } from "@material-ui/core";
+import CloseIcon from "@material-ui/icons/Close";
+import { SnackbarProvider } from "notistack";
 
 export default function MyApp({ Component, pageProps }) {
   React.useEffect(() => {
@@ -10,10 +12,24 @@ export default function MyApp({ Component, pageProps }) {
     }
   }, []);
 
+  const notistackRef = React.createRef();
+  const onClickDismiss = (key) => () => {
+    notistackRef.current.closeSnackbar(key);
+  };
+
   return (
     <>
       <CssBaseline />
-      <Component {...pageProps} />
+      <SnackbarProvider
+        ref={notistackRef}
+        action={(key) => (
+          <IconButton onClick={onClickDismiss(key)}>
+            <CloseIcon />
+          </IconButton>
+        )}
+      >
+        <Component {...pageProps} />
+      </SnackbarProvider>
     </>
   );
 }
