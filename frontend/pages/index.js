@@ -3,7 +3,13 @@ import {
   Box,
   Button,
   Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
   DialogTitle,
+  List,
+  ListItem,
+  ListItemText,
   TextField,
   Typography,
   makeStyles,
@@ -16,11 +22,6 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
     justifyContent: "center",
     alignItems: "center",
-  },
-  input: {
-    "&.MuiTextField-root": {
-      margin: theme.spacing(1),
-    },
   },
 }));
 
@@ -38,7 +39,7 @@ export default function Home() {
           <Typography variant="h5" align="center">
             To get started, click join
           </Typography>
-          <Box display="flex" justifyContent="center">
+          <Box display="flex" justifyContent="center" m={1}>
             <Button
               variant="contained"
               color="primary"
@@ -55,18 +56,69 @@ export default function Home() {
 }
 
 const SimpleDialog = (props) => {
-  const classes = useStyles();
-
+  const sessionIds = ["abc", "def", "ghi"];
+  const [name, setName] = React.useState("");
+  const [selected, setSelected] = React.useState(-1);
   const { onClose, open } = props;
 
-  const handleClose = () => {
+  React.useEffect(() => {
+    var initialName = localStorage.getItem("name");
+    initialName = initialName !== null ? initialName : "";
+    setName(initialName);
+  }, []);
+
+  const handleChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleClose = (saveName) => {
+    if (saveName) {
+      localStorage.setItem("name", name);
+    }
     onClose();
   };
 
   return (
     <Dialog onClose={handleClose} open={open}>
       <DialogTitle>Join your session</DialogTitle>
-      <TextField className={classes.input} />
+      <DialogContent>
+        <DialogContentText>
+          You can either create a new session or join existing one
+        </DialogContentText>
+        <TextField
+          fullWidth
+          label="Name"
+          value={name}
+          onChange={handleChange}
+        />
+        <List>
+          <ListItem
+            button
+            onClick={() => setSelected(-1)}
+            selected={selected === -1}
+          >
+            <ListItemText>Create a session</ListItemText>
+          </ListItem>
+          {sessionIds.map((sessionId, idx) => (
+            <ListItem
+              button
+              onClick={() => setSelected(idx)}
+              selected={selected === idx}
+              key={sessionId}
+            >
+              <ListItemText>{sessionId}</ListItemText>
+            </ListItem>
+          ))}
+        </List>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={() => handleClose(false)} color="primary">
+          Cancel
+        </Button>
+        <Button onClick={() => handleClose(true)} color="primary">
+          Create/Join
+        </Button>
+      </DialogActions>
     </Dialog>
   );
 };
