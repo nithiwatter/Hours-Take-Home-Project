@@ -4,15 +4,21 @@ const socketio = require("socket.io");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 
+// load env variables
+require("dotenv").config();
+
+let PORT = process.env.PORT_API;
+
+if (process.env.NODE_ENV === "production") {
+  PORT = process.env.PORT || 5000;
+}
+
 var mockSessions = [
   { sessionId: "abc", participants: [] },
   { sessionId: "def", participants: [] },
   { sessionId: "ghi", participants: [] },
   { sessionId: "jkl", participants: [] },
 ];
-
-// load env variables
-require("dotenv").config();
 
 const server = express();
 server.use(cors({ origin: process.env.URL_APP }));
@@ -119,6 +125,6 @@ io.on("connect", (socket) => {
   });
 });
 
-httpServer.listen(process.env.PORT_API, () => {
-  console.log(`> Ready on ${process.env.PORT_API}`);
+httpServer.listen(PORT, () => {
+  console.log(`> Ready on ${PORT}`);
 });
