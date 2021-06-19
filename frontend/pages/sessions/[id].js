@@ -49,6 +49,10 @@ export default function Sessions() {
       console.log(name);
     });
 
+    socket.on("left", ({ name }) => {
+      console.log(name);
+    });
+
     socket.emit("join", { id, name }, (res) => {
       // if no session belongs to this id
       if (res.status === "failure") {
