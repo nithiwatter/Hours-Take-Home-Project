@@ -3,7 +3,7 @@ const http = require("http");
 const cors = require("cors");
 const { v4: uuidv4 } = require("uuid");
 
-const mockSessionIds = ["abc", "def", "ghi", "jkl"];
+var mockSessionIds = ["abc", "def", "ghi", "jkl"];
 
 // load env variables
 require("dotenv").config();
@@ -21,6 +21,11 @@ server.get("/get-sessions", (_, res) => {
 
 server.get("/create-session", (_, res) => {
   mockSessionIds.push(uuidv4());
+  res.send({ status: "success" });
+});
+
+server.get("/clear-sessions", (_, res) => {
+  mockSessionIds = [];
   res.send({ status: "success" });
 });
 

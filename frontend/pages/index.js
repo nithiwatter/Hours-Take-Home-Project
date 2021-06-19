@@ -14,6 +14,7 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+import { useRouter } from "next/router";
 import axios from "axios";
 
 const useStyles = makeStyles((theme) => ({
@@ -57,6 +58,7 @@ export default function Home() {
 }
 
 const SimpleDialog = (props) => {
+  const router = useRouter();
   const [name, setName] = React.useState("");
   const [sessionIds, setSessionIds] = React.useState([]);
   const [selected, setSelected] = React.useState(-1);
@@ -87,6 +89,13 @@ const SimpleDialog = (props) => {
       localStorage.setItem("name", name);
       await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/create-session`);
     }
+
+    onClose();
+    router.push("/sessions");
+  };
+
+  const handleClear = async () => {
+    await axios.get(`${process.env.NEXT_PUBLIC_URL_API}/clear-sessions`);
     onClose();
   };
 
@@ -124,6 +133,9 @@ const SimpleDialog = (props) => {
         </List>
       </DialogContent>
       <DialogActions>
+        <Button onClick={handleClear} color="primary">
+          Clear all sessions
+        </Button>
         <Button onClick={onClose} color="primary">
           Cancel
         </Button>
