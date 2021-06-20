@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogContentText,
   DialogTitle,
+  LinearProgress,
   List,
   ListItem,
   ListItemText,
@@ -30,11 +31,14 @@ const useStyles = makeStyles((_) => ({
 
 export default function Home() {
   const [open, setOpen] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [sessions, setSessions] = React.useState([]);
   const classes = useStyles();
 
   const join = async () => {
+    setLoading(true);
     await getSessions();
+    setLoading(false);
     setOpen(true);
   };
 
@@ -62,6 +66,7 @@ export default function Home() {
               Join
             </Button>
           </Box>
+          {loading && <LinearProgress />}
         </div>
       </div>
       <SimpleDialog
