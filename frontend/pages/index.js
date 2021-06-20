@@ -135,7 +135,7 @@ const SimpleDialog = (props) => {
         <Box display="flex">
           <Box>
             <DialogContentText>
-              You can either create a new session or join existing one
+              You can either create a new session or join an existing one
             </DialogContentText>
             <TextField
               fullWidth
