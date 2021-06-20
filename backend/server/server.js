@@ -115,6 +115,14 @@ io.on("connect", (socket) => {
     }
   });
 
+  socket.on("send", ({ name, message }) => {
+    io.to(socket.session.sessionId).emit("sent", {
+      author: name,
+      text: message,
+      id: uuidv4(),
+    });
+  });
+
   socket.on("disconnect", () => {
     socket.session.participants = socket.session.participants.filter(
       (name) => name != socket.name

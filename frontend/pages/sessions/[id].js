@@ -12,6 +12,11 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
+// import ScrollToBottom, {
+//   useScrollToBottom,
+//   useScrollToEnd,
+//   useSticky,
+// } from "react-scroll-to-bottom";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import io from "socket.io-client";
@@ -36,11 +41,11 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.primary.contrastText,
     borderRadius: theme.spacing(2),
     padding: theme.spacing(1),
+    margin: theme.spacing(1),
   },
   chatMessageAuthor: {
     fontWeight: 700,
   },
-  chatInput: {},
 }));
 
 let socket;
@@ -53,8 +58,8 @@ export default function Sessions() {
   });
   const [name, setName] = React.useState("");
   const [messages, setMessages] = React.useState([
-    { text: "Test message", author: "Hello world" },
-    { text: "Test message 2", author: "Hello world 2" },
+    { text: "Test message", author: "Hello world", id: "abc" },
+    { text: "Test message 2", author: "Hello world 2", id: "def" },
   ]);
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
@@ -80,6 +85,10 @@ export default function Sessions() {
     socket.on("left", ({ session, name }) => {
       setSession(session);
       enqueueSnackbar(`${name} left the session!`, { variant: "warning" });
+    });
+
+    socket.on("sent", ({ author, text, id }) => {
+      setMessages((messages) => [...messages, { author, text, id }]);
     });
 
     socket.emit("join", { id, name }, (res) => {
@@ -118,7 +127,7 @@ export default function Sessions() {
         align="center"
       >{`Session: ${session.sessionId}`}</Typography>
 
-      <Box display="flex" pb={2}>
+      <Box display="flex" pt={2} pb={2}>
         <Box mr={4}>
           <List>
             {session.participants.map((participant) => (
@@ -153,6 +162,15 @@ function Chat(props) {
     setMessage(event.target.value);
   };
 
+  const handleKeyDown = (event) => {
+    // detect enter key
+    if (event.keyCode === 13) {
+      event.preventDefault();
+      socket.emit("send", { message, name });
+      setMessage("");
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -160,28 +178,49 @@ function Chat(props) {
       className={classes.chatContainer}
     >
       <Box flexGrow={1} className={classes.chatMessages}>
-        {messages.map((message) => (
-          <Box
-            display="flex"
-            flexDirection={name === message.author ? "row-reverse" : "row"}
-            mb={2}
-          >
-            <div className={classes.chatMessage}>
-              <div className={classes.chatMessageAuthor}>{message.author}</div>
-              <div>{message.text}</div>
-            </div>
-          </Box>
-        ))}
+        <Content name={name} messages={messages} />
       </Box>
-      <Box className={classes.chatInput}>
+
+      <Box>
         <TextField
           label="Message"
           variant="filled"
           fullWidth
           value={message}
           onChange={handleChange}
+          onKeyDown={handleKeyDown}
         />
       </Box>
     </Box>
+  );
+}
+
+function Content(props) {
+  const messagesEndRef = React.useRef(null);
+  const classes = useStyles();
+  const { name, messages } = props;
+
+  const scrollToBottom = () => {
+    messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  React.useEffect(scrollToBottom, [messages]);
+
+  return (
+    <>
+      {messages.map((message) => (
+        <Box
+          display="flex"
+          flexDirection={name === message.author ? "row-reverse" : "row"}
+          key={message.id}
+        >
+          <div className={classes.chatMessage}>
+            <div className={classes.chatMessageAuthor}>{message.author}</div>
+            <div>{message.text}</div>
+          </div>
+        </Box>
+      ))}
+      <div ref={messagesEndRef} />
+    </>
   );
 }
