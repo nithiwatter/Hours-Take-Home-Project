@@ -12,11 +12,6 @@ import {
   Typography,
   makeStyles,
 } from "@material-ui/core";
-// import ScrollToBottom, {
-//   useScrollToBottom,
-//   useScrollToEnd,
-//   useSticky,
-// } from "react-scroll-to-bottom";
 import { useSnackbar } from "notistack";
 import { useRouter } from "next/router";
 import io from "socket.io-client";
@@ -58,8 +53,7 @@ export default function Sessions() {
   });
   const [name, setName] = React.useState("");
   const [messages, setMessages] = React.useState([
-    { text: "Test message", author: "Hello world", id: "abc" },
-    { text: "Test message 2", author: "Hello world 2", id: "def" },
+    { text: "Test message", author: "Hello World", id: "abc" },
   ]);
   const classes = useStyles();
   const { enqueueSnackbar } = useSnackbar();
