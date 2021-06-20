@@ -4,6 +4,8 @@
 ## About The Project
 This is my demo for Hours take home project. It is built with React, Material-UI, Express, and Socket.IO. Since I chose to use a UI library, and Material-UI does not generally work well with Sass, I styled the project with Material-UI's built-in hooks. 
 
+The app is deployed at https://hours-take-home-project-7trv7j9s7-nithiwatter.vercel.app/. The backend is deployed at https://ancient-caverns-23167.herokuapp.com/.
+
 <!-- GETTING STARTED -->
 ## Getting Started
 Create a ```.env``` file in ```backend``` folder and a ```.env.local``` file in ```frontend``` folder.
