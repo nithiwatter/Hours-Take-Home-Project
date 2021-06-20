@@ -51,6 +51,7 @@ export default function Sessions() {
     sessionId: "",
     participants: [],
   });
+  const [name, setName] = React.useState("");
   const [messages, setMessages] = React.useState([
     { text: "Test message", author: "Hello world" },
     { text: "Test message 2", author: "Hello world 2" },
@@ -88,6 +89,7 @@ export default function Sessions() {
         handleBack();
       } else {
         setSession(res.data.session);
+        setName(name);
         setLoading(false);
       }
     });
@@ -132,7 +134,7 @@ export default function Sessions() {
           </List>
         </Box>
 
-        <Chat messages={messages} />
+        <Chat name={name} messages={messages} />
       </Box>
 
       <Button onClick={handleBack} variant="contained" color="primary">
@@ -145,7 +147,7 @@ export default function Sessions() {
 function Chat(props) {
   const [message, setMessage] = React.useState("");
   const classes = useStyles();
-  const { messages } = props;
+  const { name, messages } = props;
 
   const handleChange = (event) => {
     setMessage(event.target.value);
@@ -159,7 +161,11 @@ function Chat(props) {
     >
       <Box flexGrow={1} className={classes.chatMessages}>
         {messages.map((message) => (
-          <Box display="flex" mb={2}>
+          <Box
+            display="flex"
+            flexDirection={name === message.author ? "row-reverse" : "row"}
+            mb={2}
+          >
             <div className={classes.chatMessage}>
               <div className={classes.chatMessageAuthor}>{message.author}</div>
               <div>{message.text}</div>
